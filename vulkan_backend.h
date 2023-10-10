@@ -6,8 +6,7 @@
 #include <functional>
 #include <cstring>
 #include <source_location>
-#include <glm/glm.hpp>
-
+#include <cassert>
 struct swapChainFrame
 {
     VkFence         fence;
@@ -105,12 +104,6 @@ class boilerPlate{
         void run    ();
         void setup  ( bool validation , const char* appName);
         void cleanup();
-};
-struct Vertex 
-{
-    glm::vec2 position;
-    glm::vec3 color;
-	glm::vec2 uv;
 };
 
 
