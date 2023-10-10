@@ -95,17 +95,15 @@ VkPipelineShaderStageCreateInfo boilerPlate::loadShader(const char* fileName,VkS
 }
 void boilerPlate::LOG(VkResult res, const std::source_location location)
 {
-	std::string pref = "";
-	if (res == 0)
-	{
-		pref = "\033[32m LOG\033[0m[";
-	}
-	else
-	{
-		pref = "\033[31m LOG\033[0m[";
-		std::cout << pref << location.file_name() << ":" << location.function_name() << ":" << location.line() << ":" << res << "]" << std::endl;
-	}
-
+	#ifdef NDEBUG
+		std::string pref = "";
+		if(res != 0)
+		{
+			pref = "\033[31m LOG\033[0m[";
+			std::cout << pref << location.file_name() << ":" << location.function_name() << ":" << 
+		location.line() << ":" << res << "]" << std::endl;
+		}
+	#endif
 }
 void boilerPlate::handleResizing(VkResult res)
 {
@@ -264,9 +262,8 @@ void boilerPlate::run()
 		frameNumber++;
 	}
 }
-void boilerPlate::setup(bool validation, const char* appName)
+void boilerPlate::setup(const char* appName)
 {
-	VALIDATION_ENABLED = validation;
 	generalInfo.appName = appName;
 	glfwInitialization();
 	vulkanBoilerplate();
@@ -318,10 +315,9 @@ void boilerPlate::cleanup()
 
 		vkDestroyDevice(logicalDevice, nullptr);
 
-		if (VALIDATION_ENABLED)
-		{
+		#ifdef NDEBUG
 			debuggerDestroyer(vulkInstance, debugger, nullptr);
-		}
+		#endif
 		vkDestroyInstance(vulkInstance, nullptr);
 	}
 }
@@ -361,8 +357,6 @@ VkCommandBufferAllocateInfo info::commandBufferAllocate(VkCommandPool pool, uint
 }
 void boilerPlate::fastSubmit(std::function<void(VkCommandBuffer cmd)> &&function)
 {
-	/** @attention replace with already created fence/cmb*/
-
 	VkSubmitInfo             submit    = info::subInfo(&uploadBuffer);
 	VkCommandBufferBeginInfo beginInfo = info::bufferBeginInfo(0);
 	LOG(vkResetFences(logicalDevice,1,&uploadFence));
@@ -426,8 +420,7 @@ void boilerPlate::vulkanBoilerplate()
 	instanceInfo.pNext = NULL;
 	instanceInfo.pApplicationInfo = &appInf;
 
-	if (VALIDATION_ENABLED)
-	{
+	#ifdef NDEBUG
 		const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
 		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		// Check if this layer is available at instance level
@@ -453,17 +446,17 @@ void boilerPlate::vulkanBoilerplate()
 		{
 			std::cerr << "Validation layer VK_LAYER_KHRONOS_validation not present, validation is disabled";
 		}
-	}
+	#endif
 	instanceInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
 	instanceInfo.ppEnabledExtensionNames = instanceExtensions.data();
 	LOG(vkCreateInstance(&instanceInfo, nullptr, &vulkInstance));
 
 	LOG(glfwCreateWindowSurface(vulkInstance, window, nullptr, &surface));
 
-	if (VALIDATION_ENABLED)
-	{
+	#ifdef NDEBUG
 		setupDebugger();
-	}
+	#endif
+
 
 	uint32_t deviceCount;
 
@@ -804,156 +797,5 @@ VkFenceCreateInfo info::fence(VkFenceCreateFlags flags)
 	inf.pBindings    = bindings;
 	inf.bindingCount = bindingCount;
 
-	return inf;
-}
- VkPipelineInputAssemblyStateCreateInfo info::input_assembly_state( VkPrimitiveTopology topology, VkPipelineInputAssemblyStateCreateFlags flags,VkBool32 primitiveRestartEnable)
-{
-	VkPipelineInputAssemblyStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.flags 				   = flags;
-	inf.topology 			   = topology;
-	inf.primitiveRestartEnable = primitiveRestartEnable;
-
-	return inf;
-}
- VkPipelineRasterizationStateCreateInfo info::rasterization_state( VkPolygonMode polygonMode,VkPipelineRasterizationStateCreateFlags flags )
-{
-	VkPipelineRasterizationStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.rasterizerDiscardEnable = VK_FALSE;
-	inf.depthBiasConstantFactor = 0.0f;
-	inf.depthBiasSlopeFactor    = 0.0f;
-	inf.depthClampEnable 		= VK_FALSE;
-	inf.depthBiasEnable 		= VK_FALSE;
-	inf.depthBiasClamp 			= 0.0f;
-	inf.polygonMode 			= polygonMode;
-	inf.lineWidth 				= 1.0f;
-	inf.frontFace				= VK_FRONT_FACE_CLOCKWISE;
-	inf.cullMode 				= VK_CULL_MODE_NONE;
-
-	return inf;
-}
-VkPipelineMultisampleStateCreateInfo info::multisampling_state(VkSampleCountFlagBits rasterizationSamples,VkPipelineMultisampleStateCreateFlags flags)
-{
-	VkPipelineMultisampleStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.rasterizationSamples  = rasterizationSamples;
-	inf.flags 		          = flags;
-
-	return inf;
-}
-VkPipelineDynamicStateCreateInfo info::dynamic_state(const VkDynamicState * pDynamicStates,uint32_t dynamicStateCount,VkPipelineDynamicStateCreateFlags flags)
-{
-	VkPipelineDynamicStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.flags 			  = flags;
-	inf.pDynamicStates    = pDynamicStates;
-	inf.dynamicStateCount = dynamicStateCount;
-	
-	return inf;
-}
- VkPipelineVertexInputStateCreateInfo info::vertex_input_state(uint32_t vACount , uint32_t vBCount ,
-const VkVertexInputAttributeDescription *vAttrDesk,const VkVertexInputBindingDescription *vBindDesk,
-VkPipelineVertexInputStateCreateFlags flags) {
-
-	VkPipelineVertexInputStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-
-	inf.vertexAttributeDescriptionCount = vACount;
-	inf.vertexBindingDescriptionCount   = vBCount;
-	inf.pVertexAttributeDescriptions    = vAttrDesk;
-	inf.pVertexBindingDescriptions      = vBindDesk;
-	inf.flags 							= flags;
-
-	return inf;
-}
- VkPipelineColorBlendStateCreateInfo info::color_blend_state(int32_t attachmentCount,const VkPipelineColorBlendAttachmentState * pAttachments)
-{
-	VkPipelineColorBlendStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	
-	inf.logicOp 	    = VK_LOGIC_OP_COPY;
-	inf.pAttachments 	= pAttachments;
-	inf.logicOpEnable   = VK_FALSE;
-	inf.attachmentCount = attachmentCount;
-
-	return inf;
-}
- VkPipelineDepthStencilStateCreateInfo  info::depth_stencil(VkBool32 depthTestEnable,VkBool32 depthWriteEnable,VkCompareOp depthCompareOp)
-{
-	VkPipelineDepthStencilStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.back.compareOp	  = VK_COMPARE_OP_ALWAYS;
-	inf.depthCompareOp    = depthCompareOp;
-	inf.depthTestEnable   = depthTestEnable;
-	inf.depthWriteEnable  = depthWriteEnable;
-
-	return inf;
-}
- VkPipelineViewportStateCreateInfo info::viewport_state(const VkViewport* viewport,const VkRect2D* scissor,uint32_t viewportCount,uint32_t scissorCount,VkPipelineViewportStateCreateFlags flags)
-{
-	VkPipelineViewportStateCreateInfo inf{};
-	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	inf.pNext = nullptr;
-
-	inf.flags 		  = flags;
-	inf.pScissors 	  = scissor;
-	inf.pViewports 	  = viewport;
-	inf.scissorCount  = scissorCount;
-	inf.viewportCount = viewportCount;
-
-	return inf;
-}
- VkVertexInputAttributeDescription info::vertex_input_attr(VkFormat format,uint32_t binding,uint32_t location,uint32_t offset)
-{
-	VkVertexInputAttributeDescription inf{};
-	
-	inf.format   = format;
-	inf.offset   = offset;
-	inf.binding  = binding;
-	inf.location = location;
-
-	return inf;
-}
- VkPipelineColorBlendAttachmentState info::color_blend_attachment_state(VkColorComponentFlags colorWriteMask,VkBool32 blendEnable) 
-{
-	VkPipelineColorBlendAttachmentState inf{};
-	inf.colorWriteMask 				 =  colorWriteMask;
-	inf.blendEnable = blendEnable;
-	return inf;
-}
- VkVertexInputBindingDescription info::vertex_input_bind(uint32_t stride,uint32_t binding,VkVertexInputRate inputRate)
-{
-	VkVertexInputBindingDescription inf{};
-	
-	inf.stride    = stride;
-	inf.binding   = binding;
-	inf.inputRate = inputRate;
-
-	return inf;
-}
- VkGraphicsPipelineCreateInfo info::graphicsPipeline(VkPipelineLayout layout,VkRenderPass renderPass,VkPipelineCreateFlags flags)
-{
-	VkGraphicsPipelineCreateInfo inf {};
-	inf.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-
-	inf.flags 			   = flags;
-	inf.layout 		       = layout;
-	inf.renderPass 		   = renderPass;
-	inf.basePipelineIndex  = -1;
-	inf.basePipelineHandle = VK_NULL_HANDLE;
-	
 	return inf;
 }

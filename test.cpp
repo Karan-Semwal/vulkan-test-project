@@ -17,7 +17,10 @@ virtual void drawUI(VkCommandBuffer* cmd)
 	ImGui::Begin("Main Window",NULL,ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
 	//DO NOT TOUCH
 
-
+	if(ImGui::Button("TEST",ImVec2(200,200)))
+	{
+		std::cout << "Everything is fine\n";
+	}
 
 	//DO NOT TOUCH
 	ImGui::End();
@@ -88,7 +91,7 @@ int main()
 {
 
 	App instance;
-	instance.setup(true,"TestBuild");
+	instance.setup("TestBuild");
 	instance.run();
 	instance.cleanup();
 }
