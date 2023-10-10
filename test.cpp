@@ -1,7 +1,7 @@
-#include <imgui.h>
+#include "imgui.h"
 //for some interesting reason gcc cannot see <imgui_impl_glfw.h> on my pc
-#include "headers/imgui/imgui_impl_glfw.h"
-#include "headers/imgui/imgui_impl_vulkan.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_vulkan.h"
 #include "vulkan_backend.h"
 class App : public boilerPlate
 { 
