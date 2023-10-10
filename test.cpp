@@ -7,7 +7,6 @@ class App : public boilerPlate
 { 
 virtual void drawUI(VkCommandBuffer* cmd)
 {
-	static char buffer[100];
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();

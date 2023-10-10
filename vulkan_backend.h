@@ -121,12 +121,12 @@ namespace info
     VkPipelineViewportStateCreateInfo       viewport_state(const VkViewport* viewport,const VkRect2D* scissor,uint32_t viewportCount,uint32_t scissorCount,VkPipelineViewportStateCreateFlags flags=0);
     VkVertexInputAttributeDescription       vertex_input_attr(VkFormat format,uint32_t binding,uint32_t location,uint32_t offset);
     VkPipelineViewportStateCreateInfo       viewport_state(const VkViewport* viewport,const VkRect2D* scissor,uint32_t viewportCount,uint32_t scissorCount,VkPipelineViewportStateCreateFlags flags);
-    VkPipelineColorBlendStateCreateInfo     color_blend_state(int32_t attachmentCount,const VkPipelineColorBlendAttachmentState * pAttachments);
+    VkPipelineColorBlendStateCreateInfo     color_blend_state(int32_t attachmeentCount,const VkPipelineColorBlendAttachmentState * pAttachments);
     VkPipelineColorBlendAttachmentState     color_blend_attachment_state(VkColorComponentFlags colorWriteMask,VkBool32 blendEnable) ;
     VkPipelineColorBlendStateCreateInfo     color_blend_state(int32_t attachmentCount,const VkPipelineColorBlendAttachmentState * pAttachments);
     VkPipelineMultisampleStateCreateInfo    multisampling_state(VkSampleCountFlagBits rasterizationSamples,VkPipelineMultisampleStateCreateFlags flags = 0);
     VkPipelineVertexInputStateCreateInfo    vertex_input_state(uint32_t vACount , uint32_t vBCount ,const VkVertexInputAttributeDescription *vAttrDesk,const VkVertexInputBindingDescription *vBindDesk,VkPipelineVertexInputStateCreateFlags flags=0);
     VkPipelineDepthStencilStateCreateInfo   depth_stencil(VkBool32 depthTestEnable,VkBool32 depthWriteEnable,VkCompareOp depthCompareOp);
     VkPipelineInputAssemblyStateCreateInfo  input_assembly_state( VkPrimitiveTopology topology, VkPipelineInputAssemblyStateCreateFlags flags,VkBool32 primitiveRestartEnable);
-    VkPipelineRasterizationStateCreateInfo  rasterization_state( VkPolygonMode polygonMode,VkCullModeFlags cullMode,VkFrontFace frontFace,VkPipelineRasterizationStateCreateFlags flags = 0 ); 
+    VkPipelineRasterizationStateCreateInfo  rasterization_state( VkPolygonMode polygonMode,VkPipelineRasterizationStateCreateFlags flags = 0 ); 
 };

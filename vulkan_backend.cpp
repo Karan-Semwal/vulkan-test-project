@@ -9,44 +9,44 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	void*)
 {
 
-	char pref[200];
+	std::string pref;
 
 	switch (msgType)
 	{
 
 	case 0x00000008:
-		strcpy(pref,"[ADDR_BINDING:");
+		pref = "[ADDR_BINDING:";
 		break;
 	case 0x00000004:
-		strcpy(pref,"[PERFORMANCE:");
+		pref = "[PERFORMANCE:";
 		break;
 	case 0x00000002:
-		strcpy(pref,"[VALIDATION:");
+		pref = "[VALIDATION:";
 		break;
 	case 0x00000001:
-		strcpy(pref,"[GENERAL:");
+		pref = "[GENERAL:";
 		break;
 	default:
-		strcpy(pref,"[UNDEFINED:");
+		pref = "[UNDEFINED:";
 		break;
 	};
 
 	switch (msgSeverity)
 	{
 	case 0x00000001:
-		strcat(pref,"VERBOSE:");
+		pref += "VERBOSE:";
 		break;
 	case 0x00000100:
-		strcat(pref,"WARNING:");
+		pref += "WARNING:";
 		break;
 	case 0x00001000:
-		strcat(pref,"ERROR:");
+		pref += "ERROR:";
 		break;
 	case 0x00000010:
-		strcat(pref,"INFO:");
+		pref += "INFO:";
 		break;
 	default:
-		strcat(pref, "UNDEFINED:");
+		pref += "UNDEFINED:";
 		break;
 	};
 
@@ -818,7 +818,7 @@ VkFenceCreateInfo info::fence(VkFenceCreateFlags flags)
 
 	return inf;
 }
- VkPipelineRasterizationStateCreateInfo info::rasterization_state( VkPolygonMode polygonMode,VkCullModeFlags cullMode,VkFrontFace frontFace,VkPipelineRasterizationStateCreateFlags flags )
+ VkPipelineRasterizationStateCreateInfo info::rasterization_state( VkPolygonMode polygonMode,VkPipelineRasterizationStateCreateFlags flags )
 {
 	VkPipelineRasterizationStateCreateInfo inf{};
 	inf.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
