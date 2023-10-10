@@ -1,0 +1,1 @@
+g++ -std=c++20 -o test.exe test.cpp vulkan_backend.cpp headers/imgui/imgui.cpp  imgui_demo.cpp imgui_impl_glfw.cpp imgui_impl_vulkan.cpp imgui_tables.cpp imgui_widgets.cpp  imgui_draw.cpp glfw3.dll vulkan-1.dll -O3
